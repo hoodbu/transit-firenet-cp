@@ -135,13 +135,13 @@ resource "aviatrix_firenet" "firewall_net" {
 resource "aviatrix_transit_firenet_policy" "transit_firenet_policy1" {
   transit_firenet_gateway_name = aviatrix_transit_gateway.transit_firenet_gw.gw_name
   #inspected_resource_name      = "SPOKE:Spoke-GW-0"
-  inspected_resource_name      = "SPOKE:azure-UE-sp1"
+  inspected_resource_name      = "SPOKE:azure-UE-sp1-agw"
   depends_on = [aviatrix_firenet.firewall_net]
 }
 
 resource "aviatrix_transit_firenet_policy" "transit_firenet_policy2" {
   transit_firenet_gateway_name = aviatrix_transit_gateway.transit_firenet_gw.gw_name
   #inspected_resource_name      = "SPOKE:Spoke-GW-1"
-  inspected_resource_name      = "SPOKE:azure-UE-sp2"
+  inspected_resource_name      = "SPOKE:azure-UE-sp2-agw"
   depends_on = [aviatrix_firenet.firewall_net]
 }
