@@ -66,7 +66,7 @@ module "azure_spoke_2" {
   transit_gw      = module.azure_transit_1.transit_gateway.gw_name
 }
 
-# Create an Aviatrix Transit FireNet Policy
+/* # Create an Aviatrix Transit FireNet Policy
 resource "aviatrix_transit_firenet_policy" "transit_firenet_policy1" {
   transit_firenet_gateway_name = aviatrix_transit_gateway.transit_firenet_gw.gw_name
   #inspected_resource_name      = "SPOKE:Spoke-GW-0"
@@ -80,3 +80,4 @@ resource "aviatrix_transit_firenet_policy" "transit_firenet_policy2" {
   inspected_resource_name      = "SPOKE:azure-UE-sp2-agw"
   depends_on = [aviatrix_firenet.firewall_net]
 }
+ */

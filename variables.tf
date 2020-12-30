@@ -16,6 +16,10 @@ variable "controller_ip" {
   default = ""
 }
 
+variable "azure_account_name" {
+  default = ""
+}
+
 variable "azure_transit1_region" {
   default = "East US"
 }
