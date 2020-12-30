@@ -72,18 +72,15 @@ module "azure_spoke_2" {
   transit_gw      = module.azure_transit_1.transit_gateway.gw_name
 }
 
-/* # Create an Aviatrix Transit FireNet Policy
+# Create an Aviatrix Transit FireNet Policy
 resource "aviatrix_transit_firenet_policy" "transit_firenet_policy1" {
-  transit_firenet_gateway_name = aviatrix_transit_gateway.transit_firenet_gw.gw_name
-  #inspected_resource_name      = "SPOKE:Spoke-GW-0"
-  inspected_resource_name      = "SPOKE:azure-UE-sp1-agw"
-  depends_on = [aviatrix_firenet.firewall_net]
+  transit_firenet_gateway_name = var.azure_transit1_name
+  inspected_resource_name      = "SPOKE:lab-az-ue-sp1-agw"
+  depends_on = [azure_transit_1]
 }
 
 resource "aviatrix_transit_firenet_policy" "transit_firenet_policy2" {
-  transit_firenet_gateway_name = aviatrix_transit_gateway.transit_firenet_gw.gw_name
-  #inspected_resource_name      = "SPOKE:Spoke-GW-1"
-  inspected_resource_name      = "SPOKE:azure-UE-sp2-agw"
-  depends_on = [aviatrix_firenet.firewall_net]
+  transit_firenet_gateway_name = var.azure_transit1_name
+  inspected_resource_name      = "SPOKE:lab-az-ue-sp2-agw"
+  depends_on = [azure_transit_1]
 }
- */
