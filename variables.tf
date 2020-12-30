@@ -17,36 +17,39 @@ variable "controller_ip" {
 }
 
 variable "azure_transit1_region" {
+  default = "East US"
 }
 
 variable "azure_transit1_name" {
+  default = "LAB-AZ-UE-TR1-AGW"
 }
 
 variable "azure_transit1_cidr" {
+  default = "10.70.0.0/16"
 }
 
 variable "azure_spoke1_region" {
-  type    = string
+  default = "East US"
 }
 
 variable "azure_spoke1_name" {
-  type    = string
+  default = "LAB-AZ-UE-SP1-AGW"
 }
 
 variable "azure_spoke1_cidr" {
-  type    = string
+  default = "10.71.0.0/16"
 }
 
 variable "azure_spoke2_region" {
-  type    = string
+  default = "East US"
 }
 
 variable "azure_spoke2_name" {
-  type    = string
+  default = "LAB-AZ-UE-SP2-AGW"
 }
 
 variable "azure_spoke2_cidr" {
-  type    = string
+  default = "10.72.0.0/16"
 }
 
 variable azure_fw_size {
