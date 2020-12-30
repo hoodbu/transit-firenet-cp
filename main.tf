@@ -27,10 +27,12 @@ module "azure_transit_1" {
   source                 = "terraform-aviatrix-modules/azure-transit-firenet/aviatrix"
   version                = "2.0.2"
   ha_gw                  = var.ha_enabled
-  cidr                   = var.azure_transit1_cidr
-  region                 = var.azure_transit1_region
   account                = var.azure_account_name
-  attached               = false
+  region                 = var.azure_transit1_region
+  name                   = var.azure_transit1_name
+  cidr                   = var.azure_transit1_cidr
+  prefix                 = var.prefix
+  suffix                 = var.suffix
   enable_segmentation    = true
   firewall_image         = var.firewall_image
   firewall_image_version = var.firewall_image_version
@@ -42,10 +44,12 @@ module "azure_transit_1" {
 module "azure_spoke_1" {
   source          = "terraform-aviatrix-modules/azure-spoke/aviatrix"
   version         = "2.0.0"
+  account         = var.azure_account_name
+  region          = var.azure_spoke1_region
   name            = var.azure_spoke1_name
   cidr            = var.azure_spoke1_cidr
-  region          = var.azure_spoke1_region
-  account         = var.azure_account_name
+  prefix          = var.prefix
+  suffix          = var.suffix
   instance_size   = var.azure_spoke_instance_size
   ha_gw           = var.ha_enabled
   security_domain = aviatrix_segmentation_security_domain.indigo.domain_name
@@ -60,6 +64,8 @@ module "azure_spoke_2" {
   region          = var.azure_spoke2_region
   name            = var.azure_spoke2_name
   cidr            = var.azure_spoke2_cidr
+  prefix          = var.prefix
+  suffix          = var.suffix
   instance_size   = var.azure_spoke_instance_size
   ha_gw           = var.ha_enabled
   security_domain = aviatrix_segmentation_security_domain.indigo.domain_name

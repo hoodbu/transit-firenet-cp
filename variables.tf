@@ -16,6 +16,16 @@ variable "controller_ip" {
   default = ""
 }
 
+variable "prefix" {
+  type    = bool
+  default = false
+}
+
+variable "suffix" {
+  type    = bool
+  default = false
+}
+
 variable "azure_account_name" {
   default = ""
 }
