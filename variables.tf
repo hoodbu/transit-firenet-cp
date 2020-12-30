@@ -35,7 +35,7 @@ variable "azure_transit1_region" {
 }
 
 variable "azure_transit1_name" {
-  default = "LAB-AZ-UE-TR1-AGW"
+  default = "ace-azure-us-east-transit"
 }
 
 variable "azure_transit1_cidr" {
@@ -47,7 +47,7 @@ variable "azure_spoke1_region" {
 }
 
 variable "azure_spoke1_name" {
-  default = "LAB-AZ-UE-SP1-AGW"
+  default = "ace-azure-us-east-spoke1"
 }
 
 variable "azure_spoke1_cidr" {
@@ -59,7 +59,7 @@ variable "azure_spoke2_region" {
 }
 
 variable "azure_spoke2_name" {
-  default = "LAB-AZ-UE-SP2-AGW"
+  default = "ace-azure-us-east-spoke2"
 }
 
 variable "azure_spoke2_cidr" {
