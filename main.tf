@@ -7,128 +7,63 @@ provider "aviatrix" {
   skip_version_validation = false
 }
 
-resource "random_integer" "subnet" {
-  min = 1
-  max = 250
+# Multi-Cloud Segmentation
+resource "aviatrix_segmentation_security_domain" "yellow" {
+  domain_name = "yellow"
 }
 
-# Create Aviatrix Transit Firenet vnet
-resource "aviatrix_vpc" "transit_firenet" {
-  cloud_type           = var.cloud_type
-  account_name         = var.azure_account_name
-  region               = var.region
-  name                 = "azure-UE-tr-vpc"
-  cidr                 = "10.20.0.0/16"
-  #cidr                 = cidrsubnet("10.0.0.0/8", 8, random_integer.subnet.result)
-  aviatrix_transit_vpc = false
-  aviatrix_firenet_vpc = true
+resource "aviatrix_segmentation_security_domain" "indigo" {
+  domain_name = "indigo"
 }
 
-# Create Aviatrix Transit spoke vnets 
-resource "aviatrix_vpc" "avx_spoke_vpc" {
-  count                = var.vpc_count
-  cloud_type           = var.cloud_type
-  account_name         = var.azure_account_name
-  region               = var.region
-  #name                 = "Spoke-VNET-${count.index + 1}"
-  name                 = "azure-UE-sp${count.index + 1}-vpc"
-  #cidr                 = cidrsubnet("172.20.1.0/20", 4, random_integer.subnet.result + count.index)
-  cidr                 = cidrsubnet("10.20.1.0/20", 4, 1 + count.index)
-  aviatrix_transit_vpc = false
-  aviatrix_firenet_vpc = false
+resource "aviatrix_segmentation_security_domain_connection_policy" "yellow_indigo" {
+  domain_name_1 = "yellow"
+  domain_name_2 = "indigo"
+  depends_on = [aviatrix_segmentation_security_domain.yellow, aviatrix_segmentation_security_domain.indigo]
 }
 
-# Create Aviatrix Transit firenet gateway
-resource "aviatrix_transit_gateway" "transit_firenet_gw" {
-  cloud_type                    = var.cloud_type
-  vpc_reg                       = var.region
-  vpc_id                        = aviatrix_vpc.transit_firenet.vpc_id
-  account_name                  = aviatrix_vpc.transit_firenet.account_name
-  gw_name                       = var.avx_transit_gw
-  ha_gw_size                    = var.avx_gw_size
-  gw_size                       = var.avx_gw_size
-  subnet                        = var.hpe ? cidrsubnet(aviatrix_vpc.transit_firenet.cidr, 10, 4) : aviatrix_vpc.transit_firenet.subnets[2].cidr
-  ha_subnet                     = var.hpe ? cidrsubnet(aviatrix_vpc.transit_firenet.cidr, 10, 8) : aviatrix_vpc.transit_firenet.subnets[3].cidr 
-  enable_active_mesh            = true
-  enable_transit_firenet        = true
-  connected_transit             = true
-  depends_on = [aviatrix_vpc.transit_firenet]
+# Azure Transit Module
+module "azure_transit_1" {
+  source                 = "terraform-aviatrix-modules/azure-transit-firenet/aviatrix"
+  version                = "2.0.2"
+  ha_gw                  = var.ha_enabled
+  cidr                   = var.azure_transit1_cidr
+  region                 = var.azure_transit1_region
+  account                = var.azure_account_name
+  attached               = false
+  enable_segmentation    = true
+  firewall_image         = var.firewall_image
+  firewall_image_version = var.firewall_image_version
+  firewall_username      = "admin"
+  checkpoint_password    = "Password123!"
 }
 
-# Create Aviatrix spoke gateways and attach to transit firenet gateway
-resource "aviatrix_spoke_gateway" "avtx_spoke_gw" {
-  count              = var.vpc_count
-  cloud_type         = var.cloud_type
-  account_name       = var.azure_account_name
-  #gw_name            = "Spoke-GW-${count.index}"
-  gw_name            = "azure-UE-sp${count.index + 1}-agw"
-  vpc_id             = aviatrix_vpc.avx_spoke_vpc[count.index].vpc_id
-  vpc_reg            = var.region
-  gw_size            = var.avx_gw_size
-  subnet             = aviatrix_vpc.avx_spoke_vpc[count.index].subnets[0]["cidr"]
-  transit_gw         = var.avx_transit_gw
-  enable_active_mesh = true
-  depends_on = [aviatrix_transit_gateway.transit_firenet_gw]
+# Azure Spoke 1 
+module "azure_spoke_1" {
+  source          = "terraform-aviatrix-modules/azure-spoke/aviatrix"
+  version         = "2.0.0"
+  name            = var.azure_spoke1_name
+  cidr            = var.azure_spoke1_cidr
+  region          = var.azure_spoke1_region
+  account         = var.azure_account_name
+  instance_size   = var.azure_spoke_instance_size
+  ha_gw           = var.ha_enabled
+  security_domain = aviatrix_segmentation_security_domain.indigo.domain_name
+  transit_gw      = module.azure_transit_1.transit_gateway.gw_name
 }
 
-# Create an Aviatrix Firewall Instance 1
-resource "aviatrix_firewall_instance" "firewall_instance_1" {
-  vpc_id                        = aviatrix_vpc.transit_firenet.vpc_id
-  firenet_gw_name               = aviatrix_transit_gateway.transit_firenet_gw.gw_name
-  firewall_name                 = "azure-UE-cp1"
-  firewall_image                = var.fw_image
-  firewall_size                 = var.firewall_size
-  firewall_image_version        = var.fw_image_version
-  management_subnet             = aviatrix_vpc.transit_firenet.subnets[2].cidr
-  egress_subnet                 = aviatrix_vpc.transit_firenet.subnets[0].cidr
-  username                      = "admin"
-  password                      = var.password
-  depends_on = [aviatrix_spoke_gateway.avtx_spoke_gw]
-}
-
-# Create an Aviatrix Firewall Instance 2
-resource "aviatrix_firewall_instance" "firewall_instance_2" {
-  vpc_id                        = aviatrix_vpc.transit_firenet.vpc_id
-  firenet_gw_name               = "${aviatrix_transit_gateway.transit_firenet_gw.gw_name}-hagw" 
-  firewall_name                 = "azure-UE-cp2"
-  firewall_image                = var.fw_image
-  firewall_size                 = var.firewall_size
-  firewall_image_version        = var.fw_image_version
-  management_subnet             = aviatrix_vpc.transit_firenet.subnets[3].cidr
-  egress_subnet                 = aviatrix_vpc.transit_firenet.subnets[1].cidr
-  username                      = "admin"
-  password                      = var.password
-  depends_on = [aviatrix_spoke_gateway.avtx_spoke_gw]
-}
-
-# Create Aviatrix Transit Firewall instance associations
-resource "aviatrix_firenet" "firewall_net" {
-  vpc_id             = aviatrix_vpc.transit_firenet.vpc_id
-  inspection_enabled = true
-  egress_enabled     = true
-
-  firewall_instance_association {
-    firenet_gw_name      = aviatrix_transit_gateway.transit_firenet_gw.gw_name
-    vendor_type          = "Generic"
-    instance_id          = aviatrix_firewall_instance.firewall_instance_1.instance_id
-    firewall_name        = aviatrix_firewall_instance.firewall_instance_1.firewall_name
-    attached             = true
-    lan_interface        = aviatrix_firewall_instance.firewall_instance_1.lan_interface
-    management_interface = aviatrix_firewall_instance.firewall_instance_1.management_interface
-    egress_interface     = aviatrix_firewall_instance.firewall_instance_1.egress_interface
-  }
-
-  firewall_instance_association {
-    firenet_gw_name      = "${aviatrix_transit_gateway.transit_firenet_gw.gw_name}-hagw"
-    vendor_type          = "Generic"
-    instance_id          = aviatrix_firewall_instance.firewall_instance_2.instance_id
-    firewall_name        = aviatrix_firewall_instance.firewall_instance_2.firewall_name
-    attached             = true
-    lan_interface        = aviatrix_firewall_instance.firewall_instance_2.lan_interface
-    management_interface = aviatrix_firewall_instance.firewall_instance_2.management_interface
-    egress_interface     = aviatrix_firewall_instance.firewall_instance_2.egress_interface
-  }
-  depends_on             = [aviatrix_firewall_instance.firewall_instance_1, aviatrix_firewall_instance.firewall_instance_2]
+# Azure Spoke 2
+module "azure_spoke_2" {
+  source          = "terraform-aviatrix-modules/azure-spoke/aviatrix"
+  version         = "2.0.0"
+  account         = var.azure_account_name
+  region          = var.azure_spoke2_region
+  name            = var.azure_spoke2_name
+  cidr            = var.azure_spoke2_cidr
+  instance_size   = var.azure_spoke_instance_size
+  ha_gw           = var.ha_enabled
+  security_domain = aviatrix_segmentation_security_domain.indigo.domain_name
+  transit_gw      = module.azure_transit_1.transit_gateway.gw_name
 }
 
 # Create an Aviatrix Transit FireNet Policy

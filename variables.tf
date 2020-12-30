@@ -16,51 +16,75 @@ variable "controller_ip" {
   default = ""
 }
 
-variable "vpc_count" {
-  default = 2
+variable "azure_transit1_region" {
 }
 
-# Type is 1 for AWS and 8 for Azure
-variable "cloud_type" {
-  default = 8
+variable "azure_transit1_name" {
 }
 
-# HPE: High Performance Encryption
-variable "hpe" {
-  default = false
+variable "azure_transit1_cidr" {
 }
 
-variable "region" {
-  default = "East US"
+variable "azure_spoke1_region" {
+  type    = string
 }
 
-# key_name is valid for AWS only
-#variable "key_name" {
-#  default = "avtx-key"
-#}
-
-# This is the name of the Access Account per Cloud setup in your controller
-variable "azure_account_name" {
-  default = "azure-uhoodbhoy"
+variable "azure_spoke1_name" {
+  type    = string
 }
 
-variable "avx_transit_gw" {
-  default = "azure-UE-transit-firenet"
-}
-variable avx_gw_size {
-  default = "Standard_B2ms"
+variable "azure_spoke1_cidr" {
+  type    = string
 }
 
-variable firewall_size {
+variable "azure_spoke2_region" {
+  type    = string
+}
+
+variable "azure_spoke2_name" {
+  type    = string
+}
+
+variable "azure_spoke2_cidr" {
+  type    = string
+}
+
+variable azure_fw_size {
   default = "Standard_D3_v2"
 }
 
-variable fw_image_version {
+variable "firewall_image" {
+  type    = string
+  default = "Check Point CloudGuard IaaS Standalone (gateway + management) R80.40 - Bring Your Own License"
+  #fw_image = "Check Point CloudGuard IaaS Single Gateway R80.40 - Bring Your Own License" 
+}
+
+variable "firewall_image_version" {
+  type    = string
   default = "8040.900294.0593"
 }
 
-variable fw_image {
-  default = "Check Point CloudGuard IaaS Single Gateway R80.40 - Pay As You Go (NGTP)"
-  #default  = "Check Point CloudGuard IaaS Next-Gen Firewall w. Threat Prevention & SandBlast BYOL"
-  #fw_image = "Check Point CloudGuard IaaS Single Gateway R80.40 - Bring Your Own License" 
-} 
+variable "insane" {
+  type    = bool
+  default = true
+}
+
+variable "ha_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "azure_test_vm_rg" {
+  type    = string
+  default = ""
+}
+
+variable "azure_transit_instance_size" {
+  type    = string
+  default = "Standard_B2ms"
+}
+
+variable "azure_spoke_instance_size" {
+  type    = string
+  default = "Standard_B1ms"
+}
