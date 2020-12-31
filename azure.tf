@@ -6,7 +6,7 @@ data "template_file" "azure-init" {
 
 resource "azurerm_resource_group" "example" {
   name     = "rg-firenet-vms"
-  location = var.azure_spoke1_region
+  location = var.azure_transit1_region
 }
 
 module "azure_test_vm1" {
