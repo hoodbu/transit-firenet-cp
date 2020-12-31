@@ -1,18 +1,18 @@
 // Test Azure RG + VMs
 
 data "template_file" "azure-init" {
-  template = "${file("${path.module}/azure-vm-config/azure_bootstrap.sh")}"
+  template = "${file("${path.module}/azure_bootstrap.sh")}"
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "ace-ops-rg"
+  name     = "transit-firenet-vm-rg"
   location = var.azure_spoke1_region
 }
 
 # module "azure_test_vm1" {
 #   source                        = "Azure/compute/azurerm"
 #   resource_group_name           = azurerm_resource_group.example.name
-#   vm_hostname                   = "avxtestvm1"
+#   vm_hostname                   = "avx-firenet-spoke1-ubu"
 #   nb_public_ip                  = 1
 #   remote_port                   = "22"
 #   vm_os_simple                  = "UbuntuServer"
@@ -25,14 +25,14 @@ resource "azurerm_resource_group" "example" {
 #   admin_password                = "Password123!"
 #   tags = {
 #     environment = "ace-ops"
-#     name        = "aviatrix-test-vm1"
+#     name        = "aviatrix-firenet-spoke1-ubu"
 #   }
 # }
 
 # module "azure_test_vm2" {
 #   source                        = "Azure/compute/azurerm"
 #   resource_group_name           = azurerm_resource_group.example.name
-#   vm_hostname                   = "avxtestvm2"
+#   vm_hostname                   = "avx-firenet-spoke2-ubu"
 #   nb_public_ip                  = 1
 #   remote_port                   = "22"
 #   vm_os_simple                  = "UbuntuServer"
@@ -45,6 +45,6 @@ resource "azurerm_resource_group" "example" {
 #   admin_password                = "Password123!"
 #   tags = {
 #     environment = "ace-ops"
-#     name        = "aviatrix-test-vm2"
+#     name        = "aviatrix-firenet-spoke2-ubu"
 #   }
 # }
