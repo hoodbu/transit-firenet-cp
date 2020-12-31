@@ -70,6 +70,11 @@ variable azure_fw_size {
   default = "Standard_D3_v2"
 }
 
+variable "azure_test_instance_size" {
+  type    = string
+  default = "Standard_B1ms"
+}
+
 variable "firewall_image" {
   type    = string
   default = "Check Point CloudGuard IaaS Standalone (gateway + management) R80.40 - Bring Your Own License"
