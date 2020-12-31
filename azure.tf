@@ -9,6 +9,10 @@ resource "azurerm_resource_group" "example" {
   location = var.azure_transit1_region
 }
 
+# Test VMs have a dependency on RG. However, in TF 0.12, modules do not support 'depends_on'
+# So create RG first with VM code uncommented, then uncomment VM code to run again.
+
+
 module "azure_test_vm1" {
   source                        = "Azure/compute/azurerm"
   resource_group_name           = azurerm_resource_group.example.name
@@ -48,3 +52,4 @@ module "azure_test_vm2" {
     name        = "transit-firenet-az-east-us-spoke2-ubu"
   }
 }
+
