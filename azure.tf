@@ -9,7 +9,7 @@ resource "azurerm_resource_group" "example" {
   location = var.azure_transit1_region
 }
 
-/* module "azure_test_vm1" {
+module "azure_test_vm1" {
   source                        = "Azure/compute/azurerm"
   resource_group_name           = azurerm_resource_group.example.name
   vm_hostname                   = "transit-firenet-az-east-us-spoke1-ubu"
@@ -47,4 +47,4 @@ module "azure_test_vm2" {
     environment = "transit-firenet"
     name        = "transit-firenet-az-east-us-spoke2-ubu"
   }
-} */
+}
